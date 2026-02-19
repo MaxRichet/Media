@@ -1,0 +1,41 @@
+# WordPress Core
+wp-admin/
+wp-includes/
+index.php
+license.txt
+readme.html
+wp-*.php
+!wp-content/
+
+# Configurations & Environment
+wp-config.php
+.env
+.htaccess
+*.log
+docker-compose.override.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# wp-content contents
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/blogs.dir/
+wp-content/languages/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# Plugins
+wp-content/plugins/*
+!wp-content/plugins/news-app-core/
+
+# Themes
+wp-content/themes/*
+!wp-content/themes/news-app-theme/
+
+# Development
+node_modules/
+npm-debug.log
+.gemini/
