@@ -36,4 +36,4 @@ jobs:
 
       - name: Success Message
         if: success()
-        run: echo "✅ PHP Lint completed successfully! No syntax errors detected."
+        run: echo "PHP Lint completed successfully! No syntax errors detected."
