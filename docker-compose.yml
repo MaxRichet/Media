@@ -1,12 +1,12 @@
 services:
   db:
-      image: mysql:8.0  # Au lieu de mariadb
+      image: mysql:8.0
       restart: always
       environment:
-        MYSQL_ROOT_PASSWORD: root_password
-        MYSQL_DATABASE: wordpress
-        MYSQL_USER: wp_user
-        MYSQL_PASSWORD: wp_password
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       volumes:
         - db_data:/var/lib/mysql
 
@@ -16,12 +16,14 @@ services:
     ports:
       - "8080:80"
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: wp_user
-      WORDPRESS_DB_PASSWORD: wp_password
-      WORDPRESS_DB_NAME: wordpress
+      DB_HOST: ${WORDPRESS_DB_HOST}
+      DB_NAME: ${WORDPRESS_DB_NAME}
+      DB_USER: ${WORDPRESS_DB_USER}
+      DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
     volumes:
       - ./wp-content:/var/www/html/wp-content
+      - ./.htaccess:/var/www/html/.htaccess
+      - ./wp-config.php:/var/www/html/wp-config.php
 
 volumes:
   db_data:

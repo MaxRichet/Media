@@ -13,6 +13,10 @@ wp-config.php
 .htaccess
 *.log
 docker-compose.override.yml
+*.sql
+*.zip
+*.tar.gz
+*.tar
 
 # OS files
 .DS_Store
@@ -37,5 +41,6 @@ wp-content/themes/*
 
 # Development
 node_modules/
+vendor/
 npm-debug.log
 .gemini/

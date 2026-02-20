@@ -217,3 +217,31 @@ function news_app_inject_tracking_scripts() {
 	}
 }
 add_action( 'wp_footer', 'news_app_inject_tracking_scripts' );
+
+
+/**
+ * 7. Sécurité Avancée
+ */
+
+// Désactiver l'édition de fichiers via l'admin (Thèmes & Plugins)
+if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+	define( 'DISALLOW_FILE_EDIT', true );
+}
+
+// Masquer la version de WordPress
+function news_app_hide_wp_version() {
+	return '';
+}
+add_filter( 'the_generator', 'news_app_hide_wp_version' );
+remove_action( 'wp_head', 'wp_generator' );
+
+// Désactiver l'API XML-RPC
+add_filter( 'xmlrpc_enabled', '__return_false' );
+
+// Supprimer les liens superflus du header (RSD, WLW, Shortlinks)
+function news_app_cleanup_header() {
+	remove_action( 'wp_head', 'rsd_link' );
+	remove_action( 'wp_head', 'wlwmanifest_link' );
+	remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+}
+add_action( 'init', 'news_app_cleanup_header' );

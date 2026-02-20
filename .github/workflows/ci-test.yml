@@ -1,0 +1,35 @@
+name: PHP Lint Check
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, curl, mysql
+
+      - name: Run PHP Lint
+        run: |
+          echo "Linting files in themes and plugins..."
+          find wp-content/themes/news-app-theme/ wp-content/plugins/news-app-core/ -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected" || true
+          
+          # This second pass is to ensure we fail the job if ANY file has a syntax error
+          for file in $(find wp-content/themes/news-app-theme/ wp-content/plugins/news-app-core/ -name "*.php"); do
+            php -l "$file" || exit 1
+          done
+
+      - name: Success Message
+        if: success()
+        run: echo "✅ PHP Lint completed successfully! No syntax errors detected."
