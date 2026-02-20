@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/usr/projects/media
+            cd /root/home/usr/projects/media
             git fetch origin main
             git reset --hard origin/main
             docker compose up -d --build
