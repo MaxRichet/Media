@@ -37,3 +37,21 @@ jobs:
       - name: Success Message
         if: success()
         run: echo "PHP Lint completed successfully! No syntax errors detected."
+
+  deploy:
+    name: Deploy to Production
+    needs: php-lint
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into Server and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/news-app
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up -d --build
