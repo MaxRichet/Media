@@ -5,12 +5,11 @@ index.php
 license.txt
 readme.html
 wp-*.php
+!wp-config.php
 !wp-content/
 
 # Configurations & Environment
-wp-config.php
-.env
-.htaccess
+!.htaccess
 *.log
 docker-compose.override.yml
 *.sql
