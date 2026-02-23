@@ -16,14 +16,12 @@ services:
     ports:
       - "80:80"
     environment:
-      DB_HOST: ${WORDPRESS_DB_HOST}
-      DB_NAME: ${WORDPRESS_DB_NAME}
-      DB_USER: ${WORDPRESS_DB_USER}
-      DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
     volumes:
       - ./wp-content:/var/www/html/wp-content
-      - ./.htaccess:/var/www/html/.htaccess
-      - ./wp-config.php:/var/www/html/wp-config.php
 
 volumes:
   db_data:
