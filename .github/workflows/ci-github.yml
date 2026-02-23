@@ -39,9 +39,9 @@ jobs:
         run: echo "PHP Lint completed successfully! No syntax errors detected."
 
   deploy:
-    name: Deploy to Production
+    name: Deploy
     needs: php-lint
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
     steps:
       - name: SSH into Server and Deploy
@@ -51,7 +51,26 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/home/usr/projects/media
-            git fetch origin main
-            git reset --hard origin/main
-            docker compose up -d --build
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              TARGET_DIR="/root/home/usr/projects/media"
+              BRANCH="main"
+              DOCKER_PROJECT="media-prod"
+            else
+              TARGET_DIR="/root/home/usr/projects/media-staging"
+              BRANCH="staging"
+              DOCKER_PROJECT="media-staging"
+            fi
+
+            echo "Deploying branch $BRANCH to $TARGET_DIR..."
+
+            if [ ! -d "$TARGET_DIR" ]; then
+              echo "❌ Error: Target directory $TARGET_DIR does not exist."
+              exit 1
+            fi
+
+            cd "$TARGET_DIR"
+            git fetch origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+            
+            # Ensure the correct .env for this environment is used
+            docker compose -p "$DOCKER_PROJECT" up -d --build
