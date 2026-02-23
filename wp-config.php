@@ -13,27 +13,25 @@
  * * Database table prefix
  * * ABSPATH
  *
- * This has been slightly modified (to read environment variables) for use in Docker.
+ * This has been modified to read all sensitive configuration from environment variables.
  *
  * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/
  *
  * @package WordPress
  */
 
-// IMPORTANT: this file needs to stay in-sync with https://github.com/WordPress/WordPress/blob/master/wp-config-sample.php
-
-// ** Database settings - You can get this info from your web host ** //
+// ** Database settings - Sourced from environment variables ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', getenv('DB_NAME') ?: 'wordpress' );
+define( 'DB_NAME', getenv('WORDPRESS_DB_NAME') ?: 'wordpress' );
 
 /** Database username */
-define( 'DB_USER', getenv('DB_USER') ?: 'wp_user' );
+define( 'DB_USER', getenv('WORDPRESS_DB_USER') ?: 'wp_user' );
 
 /** Database password */
-define( 'DB_PASSWORD', getenv('DB_PASSWORD') ?: 'wp_password' );
+define( 'DB_PASSWORD', getenv('WORDPRESS_DB_PASSWORD') ?: 'wp_password' );
 
 /** Database hostname */
-define( 'DB_HOST', getenv('DB_HOST') ?: 'db' );
+define( 'DB_HOST', getenv('WORDPRESS_DB_HOST') ?: 'db' );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );
@@ -52,14 +50,14 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         'f54358ef74b9262284abb71400c00cd2c6ddf44a' );
-define( 'SECURE_AUTH_KEY',  'da6620cb17bed09b7f7de664508a4d7784e6edf8' );
-define( 'LOGGED_IN_KEY',    '29d812ca9399182af59f7d1ff2d678c5ec0a6238' );
-define( 'NONCE_KEY',        '929c77760ed4b0e4bc3bd6db900b7494fbaa9370' );
-define( 'AUTH_SALT',        '579aa6a66e158552bfd023aa90630f42b552ea29' );
-define( 'SECURE_AUTH_SALT', '562aa50d2604e9140e7612e317b5f21d4ee67e4f' );
-define( 'LOGGED_IN_SALT',   'a0200c406059e6f531d78659fdbb67e00c1c701e' );
-define( 'NONCE_SALT',       '78f809d1da1bdf3eca5861a28fff512ee6a8ba06' );
+define( 'AUTH_KEY',         getenv('AUTH_KEY') );
+define( 'SECURE_AUTH_KEY',  getenv('SECURE_AUTH_KEY') );
+define( 'LOGGED_IN_KEY',    getenv('LOGGED_IN_KEY') );
+define( 'NONCE_KEY',        getenv('NONCE_KEY') );
+define( 'AUTH_SALT',        getenv('AUTH_SALT') );
+define( 'SECURE_AUTH_SALT', getenv('SECURE_AUTH_SALT') );
+define( 'LOGGED_IN_SALT',   getenv('LOGGED_IN_SALT') );
+define( 'NONCE_SALT',       getenv('NONCE_SALT') );
 
 /**#@-*/
 

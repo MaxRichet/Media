@@ -9,6 +9,7 @@ wp-*.php
 !wp-content/
 
 # Configurations & Environment
+.env
 !.htaccess
 *.log
 docker-compose.override.yml
