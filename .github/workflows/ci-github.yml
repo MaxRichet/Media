@@ -52,11 +52,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-              TARGET_DIR="/home/usr/projects/media"
+              TARGET_DIR="/root/home/usr/projects/media"
               BRANCH="main"
               DOCKER_PROJECT="media-prod"
             else
-              TARGET_DIR="/home/usr/projects/media-staging"
+              TARGET_DIR="/root/home/usr/projects/media-staging"
               BRANCH="staging"
               DOCKER_PROJECT="media-staging"
             fi
