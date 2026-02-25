@@ -52,19 +52,20 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-              TARGET_DIR="/root/home/usr/projects/media"
+              TARGET_DIR="/home/usr/projects/media"
               BRANCH="main"
               DOCKER_PROJECT="media-prod"
             else
-              TARGET_DIR="/root/home/usr/projects/media-staging"
+              TARGET_DIR="/home/usr/projects/media-staging"
               BRANCH="staging"
               DOCKER_PROJECT="media-staging"
             fi
 
-            echo "Deploying branch $BRANCH to $TARGET_DIR..."
+            echo "🚀 Deployment started: branch $BRANCH to $TARGET_DIR..."
 
+            # Security: Check if directory exists
             if [ ! -d "$TARGET_DIR" ]; then
-              echo "❌ Error: Target directory $TARGET_DIR does not exist."
+              echo "❌ Error: Target directory $TARGET_DIR does not exist. Please initialize it first."
               exit 1
             fi
 
@@ -72,5 +73,8 @@ jobs:
             git fetch origin "$BRANCH"
             git reset --hard "origin/$BRANCH"
             
-            # Ensure the correct .env for this environment is used
-            docker compose -p "$DOCKER_PROJECT" up -d --build
+            # Docker Isolation: using specific project name and ensuring local .env is used
+            echo "📦 Rebuilding Docker containers ($DOCKER_PROJECT)..."
+            docker compose -p "$DOCKER_PROJECT" --env-file .env up -d --build
+
+            echo "✅ Deployment successful for $DOCKER_PROJECT!"
