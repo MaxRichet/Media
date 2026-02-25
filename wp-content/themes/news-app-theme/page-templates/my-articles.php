@@ -28,7 +28,6 @@ get_header(); ?>
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <select id="sort-order" class="flex-1 md:flex-none bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                     <option value="date">Plus récents</option>
-                    <option value="upvotes">Plus aimés</option>
                     <option value="title_asc">A - Z</option>
                     <option value="title_desc">Z - A</option>
                 </select>

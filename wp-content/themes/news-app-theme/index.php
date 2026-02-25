@@ -1,11 +1,13 @@
 <?php
 /**
- * Template Name: Signets
+ * Main template file for News App Theme.
+ * Version: 1.1.0
  */
+
 get_header(); ?>
 
-<!-- Sticky Header Wrapper -->
-<div class="sticky top-0 z-40 w-full bg-gray-100/80 backdrop-blur-md px-4 lg:px-8 py-6">
+<!-- Sticky Header Wrapper (Harmonized with bookmarks.php) -->
+<div class="sticky top-0 z-40 w-full bg-gray-100/80 backdrop-blur-md px-4 lg:px-8 py-6 mb-8">
     <!-- Filters & Search -->
     <header class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col xl:flex-row items-center justify-between gap-6">
         <!-- Poles Filters (Multi-select) -->
@@ -25,7 +27,7 @@ get_header(); ?>
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </span>
-                <input type="text" id="live-search" value="<?php echo get_search_query(); ?>" placeholder="Rechercher dans mes signets..." class="w-full bg-gray-50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <input type="text" id="live-search" value="<?php echo get_search_query(); ?>" placeholder="Rechercher un article..." class="w-full bg-gray-50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
             </div>
             
             <div class="flex items-center gap-3 w-full md:w-auto">
@@ -43,48 +45,35 @@ get_header(); ?>
     </header>
 </div>
 
-<div class="w-full px-4 lg:px-8 pb-12">
-    <div class="mb-8">
-        <h1 class="text-3xl font-black text-gray-900">Mes Signets</h1>
-        <p class="text-gray-500">Retrouvez ici tous les articles que vous avez enregistrés.</p>
-    </div>
-
-    <!-- Articles Loop -->
-    <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8" data-page="1" data-pole="" data-search="" data-orderby="date" data-bookmarks="true">
+<main class="w-full px-4 lg:px-8 pb-12">
+    <!-- Articles Grid -->
+    <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8" data-page="1" data-pole="" data-search="" data-orderby="date">
         <?php
-        if ( is_user_logged_in() ) {
-            $bookmarks = get_user_meta( get_current_user_id(), '_bookmarked_posts', true ) ?: array(-1); // -1 to return nothing if empty
-            $args = array(
-                'post_type' => 'articles',
-                'posts_per_page' => 20,
-                'paged' => 1,
-                'post_status' => 'publish',
-                'post__in' => $bookmarks,
-                'orderby' => 'post__in' // Maintain order of bookmarking or use date?
-            );
+        $args = array(
+            'post_type'      => 'articles',
+            'posts_per_page' => 20,
+            'paged'          => 1,
+            'post_status'    => 'publish',
+        );
 
-            $news_query = new WP_Query( $args );
+        $news_query = new WP_Query( $args );
 
-            if ( $news_query->have_posts() ) :
-                while ( $news_query->have_posts() ) : $news_query->the_post();
-                    get_template_part( 'template-parts/content', 'article' );
-                endwhile;
-                wp_reset_postdata();
-            else :
-                echo '<div class="col-span-full py-20 text-center text-gray-400 font-bold uppercase tracking-widest bg-white rounded-3xl border border-dashed border-gray-200">Aucun article n\'a été enregistré</div>';
-                echo '<style>#load-more-sentinel { display: none; }</style>';
-            endif;
-        } else {
-            echo '<script>window.location.href="' . home_url('/connexion') . '";</script>';
-        }
+        if ( $news_query->have_posts() ) :
+            while ( $news_query->have_posts() ) : $news_query->the_post();
+                get_template_part( 'template-parts/content', 'article' );
+            endwhile;
+            wp_reset_postdata();
+        else :
+            echo '<div class="col-span-full py-40 text-center text-gray-400 font-bold uppercase tracking-widest bg-white rounded-3xl border border-dashed border-gray-200">Aucun article trouvé</div>';
+        endif;
         ?>
     </div>
 
     <!-- Infinite Scroll Sentinel -->
-    <div id="load-more-sentinel" class="hidden h-20 flex items-center justify-center py-12">
+    <div id="load-more-sentinel" class="<?php echo ($news_query->have_posts()) ? '' : 'hidden'; ?> h-20 flex items-center justify-center py-12">
         <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
-</div>
+</main>
 
 <!-- Modal Structure -->
 <div id="article-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm overflow-hidden">

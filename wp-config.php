@@ -80,6 +80,15 @@ define( 'WP_DEBUG', false );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
+/** 
+ * Dynamically define URLs for different environments (local vs staging)
+ */
+if (isset($_SERVER['HTTP_HOST'])) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+    define( 'WP_HOME', $protocol . '://' . $_SERVER['HTTP_HOST'] );
+    define( 'WP_SITEURL', $protocol . '://' . $_SERVER['HTTP_HOST'] );
+}
+
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
         $_SERVER['HTTPS'] = 'on';
