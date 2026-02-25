@@ -5,139 +5,84 @@
 
 get_header(); ?>
 
-<main class="flex-1 p-6 bg-gray-50">
-    <!-- Header with Search & Filters -->
-    <div class="mb-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">Dernières Actualités</h2>
-            
-            <form role="search" method="get" class="flex gap-2" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-                <input type="search" 
-                       class="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm w-full md:w-64" 
-                       placeholder="Rechercher un article ou auteur..." 
-                       value="<?php echo get_search_query(); ?>" 
-                       name="s" />
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm">
-                    Rechercher
+<!-- Sticky Header Wrapper (Harmonized with bookmarks.php) -->
+<div class="sticky top-0 z-40 w-full bg-gray-100/80 backdrop-blur-md px-4 lg:px-8 py-6 mb-8">
+    <!-- Filters & Search -->
+    <header class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col xl:flex-row items-center justify-between gap-6">
+        <!-- Poles Filters (Multi-select) -->
+        <div id="pole-filters" class="flex flex-wrap items-center gap-2">
+            <?php $poles = array( 'Dev', 'Design', 'Market' ); ?>
+            <button data-pole="all" class="pole-btn px-5 py-3 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-lg shadow-blue-100 transition-all hover:bg-blue-700">Tous</button>
+            <?php foreach ( $poles as $pole ) : ?>
+                <button data-pole="<?php echo strtolower($pole); ?>" class="pole-btn px-5 py-3 rounded-xl text-sm font-bold bg-gray-50 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-700 hover:shadow-lg hover:shadow-gray-200/50">
+                    <?php echo $pole; ?>
                 </button>
-            </form>
+            <?php endforeach; ?>
         </div>
 
-        <!-- Filters -->
-        <div class="flex flex-wrap gap-3 mt-6">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" 
-               class="px-4 py-2 rounded-full text-sm font-medium <?php echo !isset($_GET['pole']) ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'; ?>">
-                Tous
-            </a>
-            <?php 
-            $poles = get_terms( array('taxonomy' => 'poles', 'hide_empty' => false) );
-            foreach ( $poles as $pole ) : 
-                $active = (isset($_GET['pole']) && $_GET['pole'] == $pole->slug);
-            ?>
-                <a href="<?php echo esc_url( add_query_arg( 'pole', $pole->slug, home_url( '/' ) ) ); ?>" 
-                   class="px-4 py-2 rounded-full text-sm font-medium <?php echo $active ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'; ?>">
-                    <?php echo esc_html( $pole->name ); ?>
-                </a>
-            <?php endforeach; ?>
+        <!-- Search & Sort -->
+        <div class="flex flex-col md:flex-row items-center gap-4 w-full xl:w-auto">
+            <div class="relative w-full md:w-96 group">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </span>
+                <input type="text" id="live-search" value="<?php echo get_search_query(); ?>" placeholder="Rechercher un article..." class="w-full bg-gray-50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <select id="sort-order" class="flex-1 md:flex-none bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="date">Plus récents</option>
+                    <option value="upvotes">Plus aimés</option>
+                    <option value="title_asc">A - Z</option>
+                    <option value="title_desc">Z - A</option>
+                </select>
 
-            <!-- Sorting -->
-            <div class="ml-auto flex items-center gap-2">
-                <span class="text-xs text-gray-500 uppercase font-semibold">Trier par :</span>
-                <a href="<?php echo esc_url( add_query_arg( 'order', 'desc' ) ); ?>" class="text-sm <?php echo (!isset($_GET['order']) || $_GET['order'] == 'desc') ? 'font-bold text-blue-600' : 'text-gray-500'; ?>">Récent</a>
-                <span class="text-gray-300">|</span>
-                <a href="<?php echo esc_url( add_query_arg( 'order', 'asc' ) ); ?>" class="text-sm <?php echo (isset($_GET['order']) && $_GET['order'] == 'asc') ? 'font-bold text-blue-600' : 'text-gray-500'; ?>">Ancien</a>
+                <button id="toggle-upvotes" class="flex-1 md:flex-none px-5 py-3 rounded-xl text-sm font-bold transition-all border bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100">
+                    Trier par upvote
+                </button>
             </div>
         </div>
+    </header>
+</div>
+
+<main class="w-full px-4 lg:px-8 pb-12">
+    <!-- Articles Grid -->
+    <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8" data-page="1" data-pole="" data-search="" data-orderby="date">
+        <?php
+        $args = array(
+            'post_type'      => 'articles',
+            'posts_per_page' => 20,
+            'paged'          => 1,
+            'post_status'    => 'publish',
+        );
+
+        $news_query = new WP_Query( $args );
+
+        if ( $news_query->have_posts() ) :
+            while ( $news_query->have_posts() ) : $news_query->the_post();
+                get_template_part( 'template-parts/content', 'article' );
+            endwhile;
+            wp_reset_postdata();
+        else :
+            echo '<div class="col-span-full py-40 text-center text-gray-400 font-bold uppercase tracking-widest bg-white rounded-3xl border border-dashed border-gray-200">Aucun article trouvé</div>';
+        endif;
+        ?>
     </div>
 
-    <!-- Articles Grid -->
-    <?php if ( have_posts() ) : ?>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php while ( have_posts() ) : the_post(); ?>
-                <article class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition border border-gray-100 flex flex-col">
-                    <?php if ( has_post_thumbnail() ) : ?>
-                        <div class="aspect-video overflow-hidden">
-                            <?php the_post_thumbnail( 'medium_large', array( 'class' => 'w-full h-full object-cover transform hover:scale-105 transition duration-500' ) ); ?>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <div class="p-5 flex-1 flex flex-col">
-                        <div class="flex items-center gap-2 mb-3">
-                            <?php
-                            $post_poles = get_the_terms( get_the_ID(), 'poles' );
-                            if ( $post_poles && ! is_wp_error( $post_poles ) ) :
-                                foreach ( $post_poles as $p ) : ?>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-blue-50 text-blue-600">
-                                        <?php echo esc_html( $p->name ); ?>
-                                    </span>
-                                <?php endforeach;
-                            endif;
-                            ?>
-                            <span class="text-xs text-gray-400 ml-auto"><?php echo get_the_date(); ?></span>
-                        </div>
-
-                        <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
-                            <a href="<?php the_permalink(); ?>" class="hover:text-blue-600 transition">
-                                <?php the_title(); ?>
-                            </a>
-                        </h3>
-
-                        <div class="text-gray-600 text-sm line-clamp-3 mb-4 flex-1">
-                            <?php the_excerpt(); ?>
-                        </div>
-
-                        <div class="flex items-center gap-3 pt-4 border-t border-gray-50 mt-auto">
-                            <?php 
-                            $author_id = get_the_author_meta('ID');
-                            $photo_url = get_the_author_meta('photo_url', $author_id);
-                            if ($photo_url) : ?>
-                                <img src="<?php echo esc_url($photo_url); ?>" class="w-8 h-8 rounded-full object-cover border border-gray-200" alt="">
-                            <?php else : ?>
-                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold uppercase">
-                                    <?php echo esc_html(substr(get_the_author_meta('display_name'), 0, 1)); ?>
-                                </div>
-                            <?php endif; ?>
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-gray-700"><?php the_author(); ?></span>
-                                <span class="text-[10px] text-gray-400"><?php echo get_the_author_meta('filiere'); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            <?php endwhile; ?>
-        </div>
-        
-        <!-- Pagination -->
-        <div class="mt-12 flex justify-center">
-            <?php
-            echo paginate_links( array(
-                'base'         => str_replace( 999999999, '%#%', esc_url( get_pagenum_link( 999999999 ) ) ),
-                'total'        => $wp_query->max_num_pages,
-                'current'      => max( 1, get_query_var( 'paged' ) ),
-                'format'       => '?paged=%#%',
-                'show_all'     => false,
-                'type'         => 'plain',
-                'end_size'     => 2,
-                'mid_size'     => 1,
-                'prev_next'    => true,
-                'prev_text'    => '« Précédent',
-                'next_text'    => 'Suivant »',
-            ) );
-            ?>
-        </div>
-
-    <?php else : ?>
-        <div class="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
-            <div class="text-gray-300 mb-4">
-                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v4a2 2 0 002 2h4"></path>
-                </svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-800">Aucun article trouvé</h3>
-            <p class="text-gray-500 mt-2">Essayez d'ajuster vos filtres ou votre recherche.</p>
-        </div>
-    <?php endif; ?>
+    <!-- Infinite Scroll Sentinel -->
+    <div id="load-more-sentinel" class="h-20 flex items-center justify-center py-12">
+        <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
 </main>
+
+<!-- Modal Structure -->
+<div id="article-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm overflow-hidden">
+    <div id="modal-content-wrapper" class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative shadow-2xl">
+        <div id="modal-loader" class="p-20 flex items-center justify-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+        <div id="modal-body-content"></div>
+    </div>
+</div>
 
 <?php get_footer(); ?>
