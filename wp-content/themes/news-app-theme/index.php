@@ -70,7 +70,7 @@ get_header(); ?>
     </div>
 
     <!-- Infinite Scroll Sentinel -->
-    <div id="load-more-sentinel" class="h-20 flex items-center justify-center py-12">
+    <div id="load-more-sentinel" class="<?php echo ($news_query->have_posts()) ? '' : 'hidden'; ?> h-20 flex items-center justify-center py-12">
         <div id="loading-spinner" class="hidden animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
     </div>
 </main>

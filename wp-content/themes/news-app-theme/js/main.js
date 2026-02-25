@@ -56,7 +56,12 @@ jQuery(document).ready(function($) {
                 success: function(response) {
                     if (response.trim() === '') {
                         noMorePosts = true;
-                        $('#load-more-sentinel').html('<p class="text-gray-400 text-sm font-bold uppercase tracking-widest">Tous les articles sont affichés</p>');
+                        // Only show the message if there are already articles in the container
+                        if (container.children('.article-card').length > 0) {
+                            $('#load-more-sentinel').html('<p class="text-gray-400 text-sm font-bold uppercase tracking-widest">Tous les articles sont affichés</p>');
+                        } else {
+                            $('#load-more-sentinel').addClass('hidden');
+                        }
                     } else {
                         container.append(response);
                         container.attr('data-page', currentPage + 1);
