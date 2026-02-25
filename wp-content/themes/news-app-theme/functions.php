@@ -7,6 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Auto-setup Pages
+require_once get_template_directory() . '/inc/setup-pages.php';
+
 // Theme Support
 function news_app_theme_setup() {
 	add_theme_support( 'post-thumbnails' );
