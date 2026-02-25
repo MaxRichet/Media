@@ -77,4 +77,9 @@ jobs:
             echo "📦 Rebuilding Docker containers ($DOCKER_PROJECT)..."
             docker compose -p "$DOCKER_PROJECT" --env-file .env up -d --build
 
+            # Fix Permalinks: Force flush rewrite rules inside the container
+            echo "🔧 Fixing permalinks and permissions..."
+            docker compose -p "$DOCKER_PROJECT" exec -T wordpress chown www-data:www-data /var/www/html/.htaccess
+            docker compose -p "$DOCKER_PROJECT" exec -T wordpress php -r 'require_once("wp-load.php"); flush_rewrite_rules(true);'
+
             echo "✅ Deployment successful for $DOCKER_PROJECT!"
