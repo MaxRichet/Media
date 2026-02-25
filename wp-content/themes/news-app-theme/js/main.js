@@ -320,7 +320,7 @@ jQuery(document).ready(function($) {
         e.stopPropagation();
 
         const postID = $(this).data('id');
-        const card = $(this).closest('.article-card');
+        const card = $(`.article-card[data-id="${postID}"]`);
 
         modal.removeClass('hidden').addClass('flex');
         $('body').addClass('overflow-hidden');

@@ -204,6 +204,7 @@ function news_app_ajax_get_article() {
 	$pole_list = get_the_terms( $post_id, 'poles' );
 	$upvotes = get_post_meta( $post_id, '_upvotes', true ) ?: 0;
 	$user_voted = is_user_logged_in() ? get_user_meta( get_current_user_id(), '_voted_post_' . $post_id, true ) : '';
+	$can_delete = current_user_can( 'administrator' ) || (is_user_logged_in() && get_current_user_id() == $author_id);
 
 	ob_start(); ?>
 	<div class="flex flex-col h-full max-h-[90vh]">
@@ -261,11 +262,21 @@ function news_app_ajax_get_article() {
 			</div>
 
 			<?php $is_bookmarked = news_app_is_bookmarked($post_id); ?>
-			<button class="bookmark-btn p-3 rounded-xl transition-all duration-300 <?php echo $is_bookmarked ? 'text-yellow-500 bg-yellow-50' : 'text-gray-300 hover:text-yellow-500 hover:bg-yellow-50'; ?>" data-id="<?php echo $post_id; ?>">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="<?php echo $is_bookmarked ? 'currentColor' : 'none'; ?>" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
-				</svg>
-			</button>
+			<div class="flex items-center space-x-2">
+				<?php if ( $can_delete ) : ?>
+					<button class="delete-article-btn p-3 rounded-xl transition-all duration-300 text-gray-300 hover:text-red-500 hover:bg-red-50" data-id="<?php echo $post_id; ?>" title="Supprimer l'article">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 3v7m4-7v7"/>
+						</svg>
+					</button>
+				<?php endif; ?>
+				
+				<button class="bookmark-btn p-3 rounded-xl transition-all duration-300 <?php echo $is_bookmarked ? 'text-yellow-500 bg-yellow-50' : 'text-gray-300 hover:text-yellow-500 hover:bg-yellow-50'; ?>" data-id="<?php echo $post_id; ?>">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="<?php echo $is_bookmarked ? 'currentColor' : 'none'; ?>" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+					</svg>
+				</button>
+			</div>
 		</footer>
 	</div>
 	<?php
