@@ -1,6 +1,7 @@
 <?php
 /**
  * Main template file for News App Theme.
+ * Version: 1.1.0
  */
 
 get_header(); ?>
